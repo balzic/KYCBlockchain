@@ -20,7 +20,7 @@ contract KYCProcess
     mapping (uint => address[]) private participants;
     mapping (uint => address[]) private subscribers;
     mapping (uint => bytes32[]) private documentHash;
-    
+                     //0     1       2
     enum NodeStatus{ Core, Update, Merge }
     
     struct KYCNode
@@ -37,7 +37,7 @@ contract KYCProcess
         uint prevID;
         uint nextID;
     }
-    
+
     struct Client
     {
         uint id;
@@ -173,11 +173,11 @@ contract KYCProcess
         require(nodeExists(nid), "Process does not exist");
         require(!KYCNodes[nid].merged, "Node cannot be merged");
         require(isParticipant(nid,msg.sender) || 
-                isSubscriber(nid,msg.sender))
+                isSubscriber(nid,msg.sender));
         uint newNodeID = getID();
         participants[newNodeID].push(msg.sender);
         documentHash[newNodeID].push(hash);
-        
+        KYCNodes[nid].allowMerge = false;
         uint lastID = findLastNode(cid);
         KYCNodes[lastID].nextID = newNodeID;
         uint updates = KYCNodes[nid].update;
@@ -253,7 +253,7 @@ contract KYCProcess
         }
         priceList_ = priceList;
     }
-    
+
     //buy price of node
     function priceKYC(uint nid) FI_CHECK private
         view returns (uint)
